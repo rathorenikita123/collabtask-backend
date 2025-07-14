@@ -30,3 +30,23 @@ export async function updateColumnOrder(req, res) {
   );
   res.json(column);
 }
+
+export async function updateColumnName(req, res) {
+  const { columnId } = req.params;
+  const { name } = req.body;
+
+  const column = await findByIdAndUpdate(columnId, { name }, { new: true });
+  if (!column) return res.status(404).json({ msg: "Column not found" });
+
+  res.json(column);
+}
+
+export async function deleteColumn(req, res) {
+  const { columnId } = req.params;
+
+  const column = await Column.find({ _id: columnId });
+  if (!column) return res.status(404).json({ msg: "Column not found" });
+
+  await Column.findByIdAndDelete(columnId);
+  res.json({ msg: "Column deleted successfully" });
+}

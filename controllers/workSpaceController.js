@@ -49,3 +49,19 @@ export async function removeMember(req, res) {
 
   res.json(workspace);
 }
+
+export async function deleteWorkspace(req, res) {
+  const { workspaceId } = req.params;
+
+  const workspace = await Workspace.findById(workspaceId);
+  if (!workspace) return res.status(404).json({ msg: "Workspace not found" });
+
+  if (workspace.owner.toString() !== req.userId) {
+    return res
+      .status(403)
+      .json({ msg: "Not authorized to delete this workspace" });
+  }
+
+  await Workspace.findByIdAndDelete(workspaceId);
+  res.json({ msg: "Workspace deleted successfully" });
+}

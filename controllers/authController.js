@@ -26,7 +26,7 @@ export async function loginUser(req, res) {
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
-  const isMatch = await compare(password, user.passwordHash);
+  const isMatch =  compare(password, user.passwordHash);
   if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
   const token = jsonwebtoken.sign(
@@ -85,4 +85,26 @@ export const googleLogin = async (req, res) => {
 export async function getProfile(req, res) {
   const user = await User.findById(req.userId).select("-passwordHash");
   res.json(user);
+}
+
+export async function getUserById(req, res) {
+
+  const { userId } = req.params;
+
+  console.log("Fetching user by ID:", userId);
+
+  const user = await User.findById(userId).select("-passwordHash");
+  if (!user) return res.status(404).json({ msg: "User not found" });
+
+  res.json(user);
+}
+
+export async function getAllUsers(req, res) {
+  try {
+    const users = await User.find().select("-passwordHash");
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
 }
