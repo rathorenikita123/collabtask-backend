@@ -16,14 +16,14 @@ export async function createColumn(req, res) {
 export async function getColumnsByBoard(req, res) {
   const { boardId } = req.params;
 
-  const columns = await find({ board: boardId }).sort("order");
+  const columns = await Column.find({ board: boardId }).sort("order");
   res.json(columns);
 }
 
 export async function updateColumnOrder(req, res) {
   const { columnId, newOrder } = req.body;
 
-  const column = await findByIdAndUpdate(
+  const column = await Column.findByIdAndUpdate(
     columnId,
     { order: newOrder },
     { new: true }
@@ -35,7 +35,7 @@ export async function updateColumnName(req, res) {
   const { columnId } = req.params;
   const { name } = req.body;
 
-  const column = await findByIdAndUpdate(columnId, { name }, { new: true });
+  const column = await Column.findByIdAndUpdate(columnId, { name }, { new: true });
   if (!column) return res.status(404).json({ msg: "Column not found" });
 
   res.json(column);

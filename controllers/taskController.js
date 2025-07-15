@@ -23,7 +23,7 @@ export async function createTask(req, res) {
 export async function getTasksByColumn(req, res) {
   const { columnId } = req.params;
 
-  const tasks = await find({ column: columnId })
+  const tasks = await Task.find({ column: columnId })
     .sort("order")
     .populate("assignedTo", "name email");
   res.json(tasks);
@@ -33,7 +33,7 @@ export async function updateTask(req, res) {
   const { taskId } = req.params;
   const updates = req.body;
 
-  const task = await findByIdAndUpdate(taskId, updates, { new: true });
+  const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
   res.json(task);
 }
 
@@ -53,7 +53,7 @@ export async function moveTask(req, res) {
 export async function addComment(req, res) {
   const { taskId } = req.params;
   const { userId, text } = req.body;
-  const task = await findById(taskId);
+  const task = await Task.findById(taskId);
   if (!task) return res.status(404).json({ msg: "Task not found" });
 
   const comment = {
@@ -71,7 +71,7 @@ export async function addAttachment(req, res) {
   const { taskId } = req.params;
   const { filename, url } = req.body;
 
-  const task = await findById(taskId);
+  const task = await Task.findById(taskId);
   if (!task) return res.status(404).json({ msg: "Task not found" });
   const attachment = {
     filename,
@@ -86,7 +86,7 @@ export async function addAttachment(req, res) {
 
 export async function deleteTask(req, res) {
   const { taskId } = req.params;
-  const task = await findByIdAndDelete(taskId);
+  const task = await Task.findByIdAndDelete(taskId);
   if (!task) return res.status(404).json({ msg: "Task not found" });
 
   res.json({ msg: "Task deleted successfully" });

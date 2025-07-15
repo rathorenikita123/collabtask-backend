@@ -26,14 +26,14 @@ export async function loginUser(req, res) {
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
-  const isMatch =  compare(password, user.passwordHash);
+  const isMatch = compare(password, user.passwordHash);
   if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
   const token = jsonwebtoken.sign(
     { userId: user._id },
     process.env.JWT_SECRET,
     {
-      expiresIn: "1h",
+      expiresIn: "1d",
     }
   );
 
@@ -70,7 +70,7 @@ export const googleLogin = async (req, res) => {
       { userId: user._id },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d",
+        expiresIn: "1d",
       }
     );
 
@@ -88,7 +88,6 @@ export async function getProfile(req, res) {
 }
 
 export async function getUserById(req, res) {
-
   const { userId } = req.params;
 
   console.log("Fetching user by ID:", userId);
@@ -106,5 +105,23 @@ export async function getAllUsers(req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch users" });
+  }
+}
+
+// make member to admin
+export async function makeAdmin(req, res) {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    user.role = "Admin";
+    await user.save();
+
+    res.json({ msg: "User role updated to Admin", user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update user role" });
   }
 }
